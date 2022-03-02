@@ -1,0 +1,21 @@
+.global-header{background: #3d4e5b;border: none;box-shadow: none;color: #fff;}
+.global-header .nav-links .main .nav-tab a,
+.global-header .nav-links .secondary .nav-item a,
+.global-header .nav-links .main .nav-tab a.active, .global-header .nav-links .main .nav-tab a:hover{color: #fff;border: none;}
+.global-header .header-logo a .logo{
+    height: 60px;
+}
+.wrapper-footer{
+    background: #3d4e5b;
+}
+.wrapper-footer footer#footer-openedx .colophon{
+    float: right;
+    width: auto;
+    color: #fff;
+}
+.wrapper-footer footer#footer-openedx .colophon .nav-colophon li a{
+    color: #fff;
+}
+.global-header .nav-links .secondary .dropdown-user-menu .dropdown-item a {
+    color: #000;
+}

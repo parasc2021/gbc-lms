@@ -1,0 +1,76 @@
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from instructor.utils import check_sga_in_subsection
+from six import text_type
+%>
+% if students:
+<table class="table">
+    <%
+        templateSummary = students[0]['courseware_summary']
+    %>
+    <thead>
+        <tr> <!-- Header Row -->
+            <th></th>
+            <th>${_('Total')}</th>
+            %for chapter in templateSummary:
+                %if not chapter['display_name'] == "hidden":
+                    %for section in chapter['sections']:
+                        %if section.graded and not check_sga_in_subsection(section.location, request.user):
+                           <th>${section.display_name}</th>
+                        %endif
+                    %endfor
+                %endif
+            %endfor
+            % for id, display_name in sga_block_dict.items():
+                <th>${display_name}</th>
+            % endfor
+            <th>${_('Status')}</th>
+        </tr>
+    </thead>
+    <tbody>
+        %for student in students:
+            <% not_graded = not_attempted = False %>
+            <tr>
+                <td>
+                    <a href="${reverse('student_progress', kwargs=dict(course_id=text_type(course_id), student_id=student['id']))}">${student['username']}</a>
+                </td>
+                <td>${ "{0:.0f}%".format( 100 * student['grade_summary']['percent'] ) }</td>
+                %for chapter in student['courseware_summary']:
+                    %if not chapter['display_name'] == "hidden":
+                        % for section in chapter['sections']:
+                            %if section.graded and not check_sga_in_subsection(section.location, request.user):
+                                <%
+                                    earned = section.all_total.earned
+                                    total = section.all_total.possible
+                                    score = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else 0
+                                    if not section.attempted:
+                                        not_attempted = True
+                                %>
+                                <td>${"{}".format(score)}</td>
+                            %endif
+                        %endfor
+                    %endif
+                %endfor
+                % for id, display_name in sga_block_dict.items():
+                    <%
+                        data = enrollments.get(student['username'])
+                        if data.get(id) == "NS":
+                            not_graded = True
+                        if data.get(id) == "NA":
+                            not_attempted = True
+                    %>
+                    <td>${data.get(id)}</td>
+                % endfor
+                % if not_attempted:
+                    <td>I</td>
+                % elif not_graded:
+                    <td>C</td>
+                % else:
+                    <td></td>
+                % endif
+            </tr>
+      %endfor
+    </tbody>
+</table>
+% endif

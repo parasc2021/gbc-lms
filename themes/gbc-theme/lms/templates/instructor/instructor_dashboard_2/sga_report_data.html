@@ -1,0 +1,36 @@
+% if enrollments:
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    % for id, display_name in sga_block_dict.items():
+                        <%
+                            url = "/courses/{}/jump_to/{}".format(course_key, id)
+                        %>
+                        <th>
+                            <a href="${url}">${display_name}</a></th>
+                    % endfor
+                </tr>
+            </thead>
+            <tbody>
+                % for enrollment in enrollments:
+                    <tr>
+                        <td>${enrollment.keys()[0]}</td>
+                        % for id, display_name in sga_block_dict.items():
+                            <%
+                                data = enrollment.get(enrollment.keys()[0])
+                            %>
+                            <td>${data.get(id)}</td>
+                        % endfor
+                    </tr>
+                % endfor
+            </tbody>
+        </table>
+    </div>
+% else:
+    <div class="">
+        <p>No Any Staff Gradded Assignments</p>
+    </div>
+% endif
+

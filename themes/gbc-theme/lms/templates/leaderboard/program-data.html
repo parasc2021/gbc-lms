@@ -1,0 +1,138 @@
+<%page expression_filter="h"/>
+<%inherit file="../main.html" />
+<%namespace name='static' file='../static_content.html'/>
+<%block name="bodyclass">view-grade-report</%block>
+<style type="text/css">
+#main-download, #content {width: 98%;}
+.query-report-section {padding: 30px 0;border: 1px solid #cccccc;}
+.query-report-section .container{padding: 0;}
+.query-report-section .left-div{width: 35%;float: left;position: relative;min-height: 1px;padding-right: 15px;padding-left: 15px;}
+.query-report-section .form-group {margin-bottom: 15px;}
+.query-report-section .form-group label {font-weight: 600;display: inline-block;max-width: 100%;margin-bottom: 5px;font-style: normal;font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;}
+.query-report-section .form-control {border: 2px solid #e4e4e4;border-radius: 1px;height: 42px;appearance: none;-moz-appearance: none;-webkit-appearance: none;background-image: url(data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Ctitle%3Edown-arrow%3C%2Ftitle%3E%3Cg%20fill%3D%22%23000000%22%3E%3Cpath%20d%3D%22M10.293%2C3.293%2C6%2C7.586%2C1.707%2C3.293A1%2C1%2C0%2C0%2C0%2C.293%2C4.707l5%2C5a1%2C1%2C0%2C0%2C0%2C1.414%2C0l5-5a1%2C1%2C0%2C1%2C0-1.414-1.414Z%22%20fill%3D%22%23000000%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fsvg%3E);background-repeat: no-repeat;background-position: center right 12px;background-size: 10px;padding: 5px; display: block;
+    width: 100%;
+    background-color: #fff;
+    font-size: 1em;
+    line-height: normal;
+    color: #5f5e5e;
+    font-family: 'Open Sans', ans-serif;
+    cursor: pointer;}
+.query-report-section .form-submit {
+    margin-top: 27px;
+}
+.content-data-div{position: relative;}
+body.view-grade-report{background: #fff;}
+.user-report-table-section tbody tr th{padding: 15px 10px;border: 1px solid #dddddd;line-height: 1.42857143;vertical-align: top;text-align: center;}
+.user-report-section {padding: 30px 0;}
+.user-report-section .heading{text-align: center;}
+.user-report-section .heading h2{font-size: 30px;font-weight: bold;text-decoration: underline;font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;}
+.user-report-table-section .table-responsive{min-height: .01%;overflow-x: auto;}
+.user-report-table-section table {margin-bottom: 20px;border: 1px solid #dddddd !important;background-color: transparent;border-spacing: 0;border-collapse: collapse;}
+.user-report-table-section thead tr th {border-top: 0;text-align: center;background-color: #f5f5f5;border-bottom-width: 2px;border: 1px solid #dddddd;line-height: 1.42857143;vertical-align: top;font-size: 14px;padding: 15px 10px;}
+.user-report-table-section tbody tr td {padding: 15px 10px;border: 1px solid #dddddd;line-height: 1.42857143;vertical-align: top;font-size: 14px; text-align: center;}
+.download-btn {text-align: right;}
+.user-report-table-section .download-btn .btn {min-height: 30px;line-height: 1.3;padding: 10px 20px;min-width: inherit;}
+.user-report-table-section .pagination-default {margin-bottom: 20px;}
+.user-report-table-section .pagination {display: inline-block;padding-left: 0;margin: 20px 0;border-radius: 4px;width: inherit;}
+.user-report-table-section .pagination > li {display: inline;}
+.user-report-table-section .pagination > li:first-child > a, .user-report-table-section .pagination > li:first-child > span {margin-left: 0;border-top-left-radius: 4px;border-bottom-left-radius: 4px;}
+.user-report-table-section .pagination > li > a, .user-report-table-section .pagination > li > span {position: relative;float: left;padding: 6px 12px;line-height: 1.42857143;color: #333333;text-decoration: none;background-color: linear-gradient(187deg, rgba(250,250,250,1) 0%, rgba(245,245,245,1) 70%);border: 1px solid #dddddd;border-radius: 4px;margin-right: 5px;}
+.user-report-table-section .pagination-default li.active > a {background: #0377fb;border-color: #0377fb;}
+.user-report-table-section .pagination > .active > a, 
+.user-report-table-section .pagination > .active > span, 
+.user-report-table-section .pagination > .active > a:hover, 
+.user-report-table-section .pagination > .active > span:hover, 
+.user-report-table-section .pagination > .active > a:focus, 
+.user-report-table-section .pagination > .active > span:focus {z-index: 3;color: #ffffff;cursor: default;background-color: #337ab7;border-color: #337ab7;}
+.user-report-table-section .pagination-default li a.disabled{cursor: default;opacity: inherit;}
+.report-download-msg{clear: both;background: #f2f9f2;border-top: 2px solid #008401;color: #008401;border-radius: 1px;padding: 10px 15px;margin-bottom: 20px;font-weight: 600;}
+.report-pagination, .download-btn{float: left;width: 50%;}
+.download-btn{float: right;clear: right;margin-bottom: 20px;padding: 10px 0; }
+.user-report-section .content-data-div .loading-image img{position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 114px;z-index: 10;}
+.query-report-section .form-submit .btn-default, .user-report-section .form-submit .btn-default {display: inline-block;font-size: 1.143em;background-color: #0377fb;color: #ffffff;border: 1px solid #0377fb;padding: 8px 10px;cursor: pointer;min-height: 42px;line-height: 42px;border-radius: 3px;font-weight: 600;text-align: center;background-image: none !important;text-shadow: none;min-width: 200px;letter-spacing: inherit;}
+.query-report-section .form-submit .btn-default{min-width: 100%;
+    min-height: 42px;
+    line-height: 1.3;}
+.download-area .reports-list {max-height: 201px;overflow: auto;list-style: none;border: 1px solid #cccccc;padding: 0;}
+.download-area .reports-list li {border-bottom: 1px solid #cccccc;padding: 10px;}
+</style>
+
+<main id="main-download" aria-label="Content" tabindex="-1">
+   <section class="user-report-section">
+        <div class="container-fluid">
+            <div class="heading">
+                <h2>Program Detailed Report</h2>
+            </div>
+        </div>
+    </section>
+    <div class="query-report-section">
+        <div class="container">
+            <div class="row">
+                <div class="left-div">
+                    <div class="form-group">
+                        <label for="course">Select Batch:</label>
+                        <select name="course" id="batch" class="form-control">
+                            % for batch in batches:
+                                <option value='${batch.id}'>${batch.name}</option>
+                            %endfor
+                        </select>
+                    </div>
+                </div>
+                <div class="left-div">
+                    <div class="form-submit">
+                        <input class="btn btn-default" type="submit" id="search_program_data" value="Download Report">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div id="content">
+    <div class="report-download-msg hidden">
+        <p>Report generation has been started, once generated it will be available to download</p>
+    </div>
+    <div class="download-area">
+        <ul class="reports-list">
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        get_report()
+        function get_report(){
+            $.ajax({
+                type: "GET",
+                data: {},
+                url: "/get/program-data/report/",
+                success: function(data) {
+                    if(!$(".report-download-msg").hasClass("hidden")){
+                        $(".report-download-msg").addClass('hidden')
+                    }
+                    $(".download-area ul").empty()
+                    $.each(data.data, function( index, value ) {
+                        $(".download-area ul").append('<li><a href="'+value[1]+'" target="_blank">'+value[0]+'</a></li>');
+                    })
+                },
+                complete:function(data){
+                   setTimeout(get_report, 5000);
+                }
+            });
+        }
+    $("#search_program_data").click(function () {
+    	$(".report-download-msg").removeClass('hidden')
+        var data = new FormData();
+        data.append("batch", $("#batch").val());
+        $.ajax({
+            type: "POST",
+            data: data,
+            cache: false,
+            processData: false,
+            contentType: false,
+            url: "/generate/program-data/report/",
+            success: function(data) {
+            }
+        });
+    });
+    })
+</script>

@@ -1,0 +1,48 @@
+<%page args="section_data" expression_filter="h"/>
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<%
+    course_key = str(section_data.get("course_key"))
+%>
+<style type="text/css">
+    #header-sga_reports{font-weight: bold; text-decoration: underline; padding-bottom: 25px;}
+    .sga_report-div{position: relative;}
+    .sga_report-div .loading-image img{position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 114px;z-index: 10;}
+    .table-responsive {min-height: .01%;overflow-x: auto;}
+    .table {margin-bottom: 20px;border: 1px solid #dddddd;background: transparent;border-spacing: 0;border-collapse: collapse;}
+    .table thead tr th{border: 1px solid #dddddd;border-bottom-width: 2px;line-height: 1.42857143;background-color: #f5f5f5;border-top: 0;vertical-align: top;padding: 15px 10px;}
+    .table tbody tr td {padding: 15px 10px;text-align: center;border: 1px solid #dddddd;line-height: 1.42857143;vertical-align: top;}
+    .download-sga-report{text-align: right;    margin-top: 25px;}
+    .download-sga-report a{text-decoration: none;background-color: #fff;font-size: 16px;line-height: 42px;border: 1px solid #0075b4;border-radius: 7px;display: inline-block;width: auto;text-align: center;padding: 0 15px;}
+    .download-sga-report a:hover, .download-sga-report a:focus{color: #fff !important; background: #0075b4;}
+</style>
+<div class="sga_report-div">
+<div class="loading-image">
+    <img src="${static.url('images/ajax-loader1.gif')}">
+</div>
+</div>
+<div class="download-sga-report">
+    <%
+        download_url = "/courses/{}/instructor/api/get_sga_report/".format(str(section_data.get("course_key")))
+    %>
+    <a href="${download_url}">Download SGA Report</a>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var course_key = "${course_key}"
+        $.ajax({
+            type: "POST",
+            data: {},
+            cache: false,
+            processData: false,
+            contentType: false,
+            url: "/courses/"+ course_key +"/instructor/api/get_sga_report_data/",
+            success: function(data) {
+                $(".sga_report-div").html(data.data)
+            }
+        });
+    })
+</script>

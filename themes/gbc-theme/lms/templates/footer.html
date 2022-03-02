@@ -1,0 +1,69 @@
+## mako
+<%page expression_filter="h"/>
+<%!
+  from django.urls import reverse
+  from django.utils.translation import ugettext as _
+  from lms.djangoapps.branding.api import get_footer
+  from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_enabled
+%>
+<% footer = get_footer(is_secure=is_secure) %>
+<% icp_license_info = getattr(settings, 'ICP_LICENSE_INFO', {})%>
+<%namespace name='static' file='static_content.html'/>
+
+% if uses_bootstrap:
+  <div class="container-fluid wrapper-footer">
+    <footer>
+      <div class="row">
+        <div class="col-md-9">
+          <nav class="navbar site-nav navbar-expand-sm" aria-label="${_('About')}">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" href="http://www.gbc-college.com">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="http://www.gbc-college.com/gallery/">Gallery</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="http://www.gbc-college.com/courses/">Courses</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="http://www.gbc-college.com/help/">Contact</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </footer>
+  </div>
+% else:
+  <div class="wrapper wrapper-footer">
+    <footer id="footer-openedx" class="grid-container"
+      ## When rendering the footer through the branding API,
+      ## the direction may not be set on the parent element,
+      ## so we set it here.
+      % if bidi:
+        dir=${bidi}
+      % endif
+    >
+    <div style="float:left;color:#f0f0f0;margin-top:5px;">GBC College for Leadership Development © 2022</div>
+      <div class="colophon">
+        <nav class="nav-colophon" aria-label="${_('About')}">
+          <ol>
+            <li class="nav-colophon-01">
+              <a id="about" href="http://www.gbc-college.com">Home</a>
+            </li>
+            <li class="nav-colophon-01">
+              <a id="jobs" href="http://www.gbc-college.com/gallery/">Gallery</a>
+            </li>
+            <li class="nav-colophon-01">
+              <a id="faq" href="http://www.gbc-college.com/courses/">Courses</a>
+            </li>
+            <li class="nav-colophon-01">
+              <a id="contact" href="http://www.gbc-college.com/help/">Contact</a>
+            </li>
+          </ol>
+        </nav>
+      </div>
+    </footer>
+  </div>
+% endif
