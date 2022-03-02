@@ -108,7 +108,7 @@ def get_grade_book_page(request, course, course_key, skip_admins=False):
                     'id': student.id,
                     'email': student.email,
                     'grade_summary': course_grade.summary,
-                    'courseware_summary': course_grade.chapter_grades
+                    'courseware_summary': course_grade.customized_chapter_grades
                 }
             )
 

@@ -16,10 +16,13 @@
             <tbody>
                 % for enrollment in enrollments:
                     <tr>
-                        <td>${enrollment.keys()[0]}</td>
+                        <%
+                            keys = list(enrollment.keys())
+                        %>
+                        <td>${keys[0]}</td>
                         % for id, display_name in sga_block_dict.items():
                             <%
-                                data = enrollment.get(enrollment.keys()[0])
+                                data = enrollment.get(keys[0])
                             %>
                             <td>${data.get(id)}</td>
                         % endfor

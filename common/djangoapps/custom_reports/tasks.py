@@ -23,7 +23,7 @@ from lms.djangoapps.instructor.utils import check_sga_in_subsection
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from common.djangoapps.student.models import CourseAccessRole
-
+from common.djangoapps.course_manage.models import CourseManage
 from common.djangoapps.leaderboard.models import LeaderBoard, Batch
 from .helpers import get_course_status
 
@@ -68,11 +68,8 @@ def generate_grade_report_csv(username, batch):
     users = User.objects.filter(is_active=True, profile__batch=batch).order_by(
         "username"
     )
-    courses = (
-        CourseOverview.objects.select_related("image_set")
-        .filter(course_batch=batch.name)
-        .order_by("display_name")
-    )
+    courses = CourseManage.objects.filter(batch=batch).order_by("course__display_name")
+    courses = [course_mange.course for course_mange in courses]
     course_ids = [course.id for course in courses]
     admin_users = set(
         CourseAccessRole.objects.filter(course_id__in=course_ids).values_list("user")
@@ -130,11 +127,8 @@ def generate_program_report_csv(username, batch):
     users = User.objects.filter(is_active=True, profile__batch=batch).order_by(
         "username"
     )
-    courses = (
-        CourseOverview.objects.select_related("image_set")
-        .filter(course_batch=batch.name)
-        .order_by("display_name")
-    )
+    courses = CourseManage.objects.filter(batch=batch).order_by("course__display_name")
+    courses = [course_mange.course for course_mange in courses]
     course_ids = [course.id for course in courses]
     admin_users = set(
         CourseAccessRole.objects.filter(course_id__in=course_ids).values_list("user")
@@ -157,8 +151,8 @@ def generate_program_report_csv(username, batch):
             course_key = course.id
             course = get_course_with_access(user, "staff", course_key, depth=None)
             with modulestore().bulk_operations(course.location.course_key):
-                course_grade = CourseGradeFactory().create(student, course)
-                courseware_summary = course_grade.chapter_grades
+                course_grade = CourseGradeFactory().read(student, course)
+                courseware_summary = course_grade.customized_chapter_grades
                 grade_summary = course_grade.summary
 
             header_data.append("Total")

@@ -1,7 +1,7 @@
 <%!
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
-from instructor.utils import check_sga_in_subsection
+from django.urls import reverse
+from lms.djangoapps.instructor.utils import check_sga_in_subsection
 from six import text_type
 %>
 % if students:
@@ -44,7 +44,7 @@ from six import text_type
                                     earned = section.all_total.earned
                                     total = section.all_total.possible
                                     score = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else 0
-                                    if not section.attempted:
+                                    if not section._should_persist_per_attempted():
                                         not_attempted = True
                                 %>
                                 <td>${"{}".format(score)}</td>

@@ -10,8 +10,8 @@ def get_course_status(staff_user, course_key, student):
     course = get_course_with_access(staff_user, "staff", course_key, depth=None)
 
     with modulestore().bulk_operations(course.location.course_key):
-        course_grade = CourseGradeFactory().create(student, course)
-        courseware_summary = course_grade.chapter_grades
+        course_grade = CourseGradeFactory().read(student, course)
+        courseware_summary = course_grade.customized_chapter_grades
 
     sga_blocks = modulestore().get_items(course_key, qualifiers={"category": "edx_sga"})
     not_attempted = not_graded = False
@@ -31,7 +31,7 @@ def get_course_status(staff_user, course_key, student):
                 if section.graded and not check_sga_in_subsection(
                     section.location, staff_user
                 ):
-                    if not section.attempted:
+                    if not section._should_persist_per_attempted():
                         not_attempted = True
 
     if not_attempted:

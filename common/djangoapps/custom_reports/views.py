@@ -16,6 +16,7 @@ from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_st
 from common.djangoapps.student.models import CourseAccessRole
 
 from common.djangoapps.leaderboard.models import LeaderBoard, Batch
+from common.djangoapps.course_manage.models import CourseManage
 from .tasks import generate_program_report_csv, generate_grade_report_csv
 
 
@@ -27,7 +28,7 @@ def grade_data(request):
     batches = Batch.objects.all().order_by("name")
     context = {"batches": batches}
     if request.user.is_staff or request.user.is_superuser:
-        return render_to_response("leaderboard/grade-data.html", context)
+        return render_to_response("custom_reports/grade-data.html", context)
     else:
         raise Http404()
 
@@ -41,11 +42,8 @@ def get_grade_data(request):
     users = User.objects.filter(is_active=True, profile__batch=batch).order_by(
         "username"
     )
-    courses = (
-        CourseOverview.objects.select_related("image_set")
-        .filter(course_batch=batch.name)
-        .order_by("display_name")
-    )
+    courses = CourseManage.objects.filter(batch=batch).order_by("course__display_name")
+    courses = [course_mange.course for course_mange in courses]
     course_ids = [course.id for course in courses]
     admin_users = set(
         CourseAccessRole.objects.filter(course_id__in=course_ids).values_list("user")
@@ -63,7 +61,7 @@ def get_grade_data(request):
     except EmptyPage:
         users = paginator.page(paginator.num_pages)
     context = {"users": users, "courses": courses}
-    template = render_to_string("leaderboard/table-data-grade.html", context)
+    template = render_to_string("custom_reports/table-data-grade.html", context)
 
     return JsonResponse({"data": template}, status=200)
 
@@ -109,7 +107,7 @@ def program_data(request):
     batches = Batch.objects.all().order_by("name")
     context = {"batches": batches}
     if request.user.is_staff or request.user.is_superuser:
-        return render_to_response("leaderboard/program-data.html", context)
+        return render_to_response("custom_reports/program-data.html", context)
     else:
         raise Http404()
 
@@ -145,61 +143,3 @@ def get_program_data_report(request):
 
     files.reverse()
     return JsonResponse({"data": files}, status=200)
-
-
-@login_required
-def grade_data(request):
-    """
-    Grade report including all courses
-    """
-    if request.user.is_staff or request.user.is_superuser:
-        return render_to_response("courseware/grade-data.html")
-    else:
-        raise Http404()
-
-
-@login_required
-def get_grade_data(request):
-    """
-    Return Grade report including all courses in json format
-    """
-    users = User.objects.filter(is_active=True).order_by("username")
-    courses = CourseOverview.objects.select_related("image_set").all()
-    paginator = Paginator(users, 2)
-    page = request.POST.get("page", 1)
-    try:
-        users = paginator.page(page)
-    except PageNotAnInteger:
-        users = paginator.page(1)
-    except EmptyPage:
-        users = paginator.page(paginator.num_pages)
-    context = {"users": users, "courses": courses}
-    template = render_to_string("courseware/table-data-grade.html", context)
-
-    return JsonResponse({"data": template}, status=200)
-
-
-@login_required
-def get_grade_data_report(request):
-    """
-    Return Grade report in CSV Format
-    """
-    if request.user.is_staff or request.user.is_superuser:
-        users = User.objects.filter(is_active=True).order_by("username")
-        courses = CourseOverview.objects.select_related("image_set").all()
-        header_data = [
-            "",
-        ]
-        for course in courses:
-            header_data.append(course.display_name)
-
-        row_data = []
-        for user in users:
-            student_info = [user.username]
-            for course in courses:
-                student_info.append(10)
-            row_data.append(student_info)
-
-        return create_csv_response("Gradebook.csv", header_data, row_data)
-    else:
-        raise Http404()

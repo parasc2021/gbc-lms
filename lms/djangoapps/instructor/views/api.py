@@ -3524,13 +3524,15 @@ def get_sga_report(request, course_id):
 
     row_data = []
     for enrollment in students_enrollments:
-        enrollment_data = [enrollment.keys()[0]]
+        keys_list = list(enrollment.keys())
+        enrollment_data = [keys_list[0]]
         for key, display_name in sga_block_dict.items():
-            data = enrollment.get(enrollment.keys()[0])
+            data = enrollment.get(keys_list[0])
             enrollment_data.append(data.get(key))
         row_data.append(enrollment_data)
     report_name = "{} SGA Report.csv".format(course_key.course)
-    return instructor_analytics.csvs.create_csv_response(
+
+    return instructor_analytics_csvs.create_csv_response(
         report_name, header_data, row_data
     )
 
@@ -3613,7 +3615,7 @@ def get_gradebook_report(request, course_id):
                             else 0
                         )
                         student_info.append(score)
-                        if not section.attempted:
+                        if not section._should_persist_per_attempted():
                             not_attempted = True
 
         for key, display_name in sga_block_dict.items():
@@ -3630,7 +3632,7 @@ def get_gradebook_report(request, course_id):
         row_data.append(student_info)
 
     report_name = "{} Gradebook.csv".format(course_key.course)
-    return instructor_analytics.csvs.create_csv_response(
+    return instructor_analytics_csvs.create_csv_response(
         report_name, header_data, row_data
     )
 
